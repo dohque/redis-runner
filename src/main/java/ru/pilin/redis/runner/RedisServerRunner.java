@@ -1,7 +1,10 @@
 package ru.pilin.redis.runner;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +32,18 @@ public class RedisServerRunner {
     public void start() {
         log.trace(".start()");
         try {
-            process = runtime.exec("/usr/local/bin/redis-server");
+            process = runtime.exec("/usr/local/bin/redis-server -");
+            InputStream input = getClass().getResourceAsStream("/redis-test.conf");
+            OutputStream output = process.getOutputStream();
+            try {
+                IOUtils.copy(input, output);
+            } finally {
+                IOUtils.closeQuietly(input);
+                IOUtils.closeQuietly(output);
+            }
+            // TODO bind output stream to 
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            throw new RedisServerExcpetion(e.getMessage(), e);
         }
     }
 
@@ -42,7 +54,7 @@ public class RedisServerRunner {
             jedis.shutdown();
             process.waitFor();
         } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
+            throw new RedisServerExcpetion(e.getMessage(), e);
         }
     }
 }
