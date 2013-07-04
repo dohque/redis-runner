@@ -41,7 +41,7 @@ public class RedisServerRunner {
                 IOUtils.closeQuietly(input);
                 IOUtils.closeQuietly(output);
             }
-            // TODO bind output stream to 
+            // TODO bind output stream to log
         } catch (IOException e) {
             throw new RedisServerExcpetion(e.getMessage(), e);
         }
