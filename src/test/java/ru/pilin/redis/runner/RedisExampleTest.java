@@ -15,6 +15,7 @@ public class RedisExampleTest {
         Jedis jedis = new Jedis("localhost", 6379);
         jedis.connect();
         try {
+            assertNull(jedis.get("test:redis:passed"));
             jedis.set("test:redis:passed", "true");
             assertEquals("true", jedis.get("test:redis:passed"));
         } finally {
