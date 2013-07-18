@@ -33,6 +33,7 @@ public class RedisServerRunner {
         log.trace(".start()");
         try {
             process = runtime.exec("/usr/local/bin/redis-server -");
+            // TODO probably we should wait for redis to start
             InputStream input = getClass().getResourceAsStream("/redis-test.conf");
             OutputStream output = process.getOutputStream();
             try {
