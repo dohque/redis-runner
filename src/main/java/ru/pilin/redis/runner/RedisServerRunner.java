@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisServerRunner {
 
@@ -33,7 +34,6 @@ public class RedisServerRunner {
         log.trace(".start()");
         try {
             process = runtime.exec("/usr/local/bin/redis-server -");
-            // TODO probably we should wait for redis to start
             InputStream input = getClass().getResourceAsStream("/redis-test.conf");
             OutputStream output = process.getOutputStream();
             try {
@@ -41,6 +41,25 @@ public class RedisServerRunner {
             } finally {
                 IOUtils.closeQuietly(input);
                 IOUtils.closeQuietly(output);
+            }
+//            TODO better way to wait for redis to start
+            int tries = 0;
+            while (true) {
+                tries ++;
+                try {
+                    jedis.connect();
+                    break;
+                } catch (JedisConnectionException e) {
+                    if (tries < 10) {
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                    } else {
+                        throw new RedisServerExcpetion(e.getMessage(), e);
+                    }
+                }
             }
             // TODO bind output stream to log
         } catch (IOException e) {
@@ -52,7 +71,8 @@ public class RedisServerRunner {
     public void stop() {
         log.trace(".stop()");
         try {
-            jedis.shutdown();
+            String result = jedis.shutdown();
+            log.debug("Shutdown returned: {}", result);
             process.waitFor();
         } catch (InterruptedException e) {
             throw new RedisServerExcpetion(e.getMessage(), e);

@@ -2,18 +2,26 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.pilin</groupId>
-    <artifactId>redis-junit</artifactId>
+    <artifactId>redis-runner</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Redis junit</name>
-    <description>JUnit4 runner to run redis server in unit tests.</description>
+    <name>Redis runner</name>
+    <description>Runs redis server for unit tests.</description>
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
+                    <encoding>UTF-8</encoding>
                     <source>1.6</source>
                     <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
         </plugins>
@@ -30,19 +38,17 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.5</version>
         </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.1.0</version>
+        </dependency>
 
         <!-- Test deps -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.1.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -51,4 +57,16 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>repo</id>
+            <url>https://github.com/dohque/maven/raw/master/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshot-repo</id>
+            <url>https://github.com/dohque/maven/raw/master/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>

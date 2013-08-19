@@ -12,17 +12,26 @@ public class RedisServerRunnerTest {
     public void shouldStartAndStopRedisServerFromPath() throws Exception {
         RedisServerRunner redisServerRunner = new RedisServerRunner();
         redisServerRunner.start();
-        Jedis jedis = new Jedis("localhost", 6379);
-        jedis.connect();
         try {
-            jedis.set("test:redis:passed", "true");
-            assertEquals("true", jedis.get("test:redis:passed"));
+            Jedis jedis = new Jedis("localhost", 6379);
+            jedis.connect();
+            try {
+                jedis.set("test:redis:passed", "true");
+                assertEquals("true", jedis.get("test:redis:passed"));
+            } finally {
+                jedis.disconnect();
+            }
         } finally {
-            jedis.disconnect();
+            redisServerRunner.stop();
         }
-        redisServerRunner.stop();
         try {
-            jedis.dbSize();
+            Jedis jedis = new Jedis("localhost", 6379);
+            jedis.connect();
+            try {
+                jedis.dbSize();
+            } finally {
+                jedis.disconnect();
+            }
             fail("Redis was not stopped");
         } catch (Exception e) {
         }
