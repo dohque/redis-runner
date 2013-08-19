@@ -21,6 +21,8 @@ public class RedisServerRunner {
 
     private Process process;
 
+    private String redisServerCmd = "/usr/local/bin/redis-server";
+
     public RedisServerRunner(String hostname, int port) {
         super();
         jedis = new Jedis(hostname, port);
@@ -33,7 +35,7 @@ public class RedisServerRunner {
     public void start() {
         log.trace(".start()");
         try {
-            process = runtime.exec("/usr/local/bin/redis-server -");
+            process = runtime.exec(redisServerCmd + " -");
             InputStream input = getClass().getResourceAsStream("/redis-test.conf");
             OutputStream output = process.getOutputStream();
             try {
@@ -77,5 +79,9 @@ public class RedisServerRunner {
         } catch (InterruptedException e) {
             throw new RedisServerExcpetion(e.getMessage(), e);
         }
+    }
+
+    public void setRedisServerCmd(String redisServerCmd) {
+        this.redisServerCmd = redisServerCmd;
     }
 }
