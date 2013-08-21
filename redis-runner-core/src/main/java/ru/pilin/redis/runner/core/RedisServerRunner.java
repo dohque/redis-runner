@@ -1,10 +1,7 @@
 package ru.pilin.redis.runner.core;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,15 +32,9 @@ public class RedisServerRunner {
     public void start() {
         log.trace(".start()");
         try {
-            process = runtime.exec(new String[] { redisServerCmd, "-" });
-            InputStream input = getClass().getResourceAsStream("/redis-test.conf");
-            OutputStream output = process.getOutputStream();
-            try {
-                IOUtils.copy(input, output);
-            } finally {
-                IOUtils.closeQuietly(input);
-                IOUtils.closeQuietly(output);
-            }
+            String configFile = getClass().getResource("/redis-test.conf").getFile();
+            log.debug("Starting Redis with config {}", configFile);
+            process = runtime.exec(new String[] { redisServerCmd, configFile });
 //            TODO better way to wait for redis to start
             int tries = 0;
             while (true) {
