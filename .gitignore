@@ -1,11 +1,9 @@
 *.class
 
 .*
-target/*
 target
 
 # Package Files #
 *.jar
 *.war
 *.ear
-/target
