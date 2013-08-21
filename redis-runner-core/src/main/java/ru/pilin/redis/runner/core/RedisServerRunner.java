@@ -1,5 +1,6 @@
 package ru.pilin.redis.runner.core;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -32,7 +33,8 @@ public class RedisServerRunner {
     public void start() {
         log.trace(".start()");
         try {
-            String configFile = getClass().getResource("/redis-test.conf").getFile();
+            String configFile = new File(getClass()
+                .getResource("/redis-test.conf").getFile()).getAbsolutePath();
             log.debug("Starting Redis with config {}", configFile);
             process = runtime.exec(new String[] { redisServerCmd, configFile });
 //            TODO better way to wait for redis to start
