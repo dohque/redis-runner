@@ -60,18 +60,40 @@ public class RedisServerRunner {
         } catch (IOException e) {
             throw new RedisServerExcpetion(e.getMessage(), e);
         }
+        log.debug("Redis Server is up.");
     }
 
-    // TODO: rename to shutdown
+    /**
+     * @deprecated use {@link #shutdown()}
+     */
+    @Deprecated
     public void stop() {
-        log.trace(".stop()");
+        shutdown();
+    }
+
+    public void shutdown() {
+        log.trace(".shutdown()");
+        Thread waitForRedisStop = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    process.waitFor();
+                } catch (InterruptedException ignore) {
+                }
+            }
+        });
         try {
-            String result = jedis.shutdown();
-            log.debug("Shutdown returned: {}", result);
-            process.waitFor();
+            jedis.shutdown();
+            waitForRedisStop.start();
+            waitForRedisStop.join(500);
         } catch (InterruptedException e) {
-            throw new RedisServerExcpetion(e.getMessage(), e);
+            throw new RedisServerExcpetion("Redis shutdown interrupted", e);
+        } finally {
+            if (waitForRedisStop.isAlive()) {
+                waitForRedisStop.interrupt();
+                process.destroy();
+            }
         }
+        log.debug("Redis Server is down.");
     }
 
     public void setRedisServerCmd(String redisServerCmd) {
