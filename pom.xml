@@ -11,6 +11,8 @@
     <modules>
         <module>redis-runner-core</module>
         <module>redis-runner-junit</module>
+        <module>redis-maven-plugin</module>
+        <module>redis-maven-plugin-example</module>
     </modules>
 
     <dependencyManagement>
