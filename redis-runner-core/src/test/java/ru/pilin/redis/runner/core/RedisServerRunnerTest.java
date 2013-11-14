@@ -10,9 +10,9 @@ import ru.pilin.redis.runner.core.RedisServerRunner;
 public class RedisServerRunnerTest {
 
     @Test
-    public void shouldStartAndStopRedisServerFromPath() throws Exception {
+    public void shouldStartAndStopRedisServerFromDefaultLocation() throws Exception {
         RedisServerRunner redisServerRunner = new RedisServerRunner();
-        redisServerRunner.start();
+        RedisServerProcess process = redisServerRunner.start();
         try {
             Jedis jedis = new Jedis("localhost", 6379);
             jedis.connect();
@@ -23,7 +23,7 @@ public class RedisServerRunnerTest {
                 jedis.disconnect();
             }
         } finally {
-            redisServerRunner.stop();
+            process.shutdown();
         }
         try {
             Jedis jedis = new Jedis("localhost", 6379);

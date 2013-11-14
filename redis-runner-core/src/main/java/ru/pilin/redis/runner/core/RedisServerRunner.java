@@ -1,6 +1,5 @@
 package ru.pilin.redis.runner.core;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -11,33 +10,39 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisServerRunner {
 
-    private Logger log = LoggerFactory.getLogger(RedisServerRunner.class);
+    private final Logger log = LoggerFactory.getLogger(RedisServerRunner.class);
 
-    private Runtime runtime = Runtime.getRuntime();
+    private final RedisServerConfiguration configuration;
 
-    private final Jedis jedis;
-
-    private Process process;
+    private RedisServerProcess redisServerProcess;
 
     private String redisServerCmd = "/usr/local/bin/redis-server";
 
+    @Deprecated
     public RedisServerRunner(String hostname, int port) {
         super();
-        jedis = new Jedis(hostname, port);
+        configuration = new RedisServerConfiguration(redisServerCmd, hostname, port);
+    }
+
+    public RedisServerRunner(RedisServerConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     public RedisServerRunner() {
         this("localhost", 6379);
     }
 
-    public void start() {
+    public RedisServerProcess start() {
         log.trace(".start()");
         try {
-            String configFile = new File(getClass()
-                .getResource("/redis-test.conf").getFile()).getAbsolutePath();
-            log.debug("Starting Redis with config {}", configFile);
-            process = runtime.exec(new String[] { redisServerCmd, configFile });
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(new String[] {
+                configuration.getRedisServerCmd(),
+                configuration.getRedisConf().getAbsolutePath() });
 //            TODO better way to wait for redis to start
+            Jedis jedis = new Jedis(
+                configuration.getHostname(),
+                configuration.getPort());
             int tries = 0;
             while (true) {
                 tries ++;
@@ -57,10 +62,12 @@ public class RedisServerRunner {
                 }
             }
             // TODO bind output stream to log
+            redisServerProcess = new RedisServerProcess(process, jedis);
+            log.debug("Redis Server is up.");
+            return redisServerProcess;
         } catch (IOException e) {
             throw new RedisServerExcpetion(e.getMessage(), e);
         }
-        log.debug("Redis Server is up.");
     }
 
     /**
@@ -71,29 +78,12 @@ public class RedisServerRunner {
         shutdown();
     }
 
+    /**
+     * @deprecated use {@link RedisServerProcess#shutdown()}
+     */
+    @Deprecated
     public void shutdown() {
-        log.trace(".shutdown()");
-        Thread waitForRedisStop = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    process.waitFor();
-                } catch (InterruptedException ignore) {
-                }
-            }
-        });
-        try {
-            jedis.shutdown();
-            waitForRedisStop.start();
-            waitForRedisStop.join(500);
-        } catch (InterruptedException e) {
-            throw new RedisServerExcpetion("Redis shutdown interrupted", e);
-        } finally {
-            if (waitForRedisStop.isAlive()) {
-                waitForRedisStop.interrupt();
-                process.destroy();
-            }
-        }
-        log.debug("Redis Server is down.");
+        redisServerProcess.shutdown();
     }
 
     public void setRedisServerCmd(String redisServerCmd) {
