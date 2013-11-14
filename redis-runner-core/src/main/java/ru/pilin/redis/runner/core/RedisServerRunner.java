@@ -21,6 +21,10 @@ public class RedisServerRunner {
     @Deprecated
     public RedisServerRunner(String hostname, int port) {
         super();
+        String redisServerCmdProp = System.getProperty("redis.server.cmd");
+        if (redisServerCmdProp != null) {
+            redisServerCmd = redisServerCmdProp;
+        }
         configuration = new RedisServerConfiguration(redisServerCmd, hostname, port);
     }
 
