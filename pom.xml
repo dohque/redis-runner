@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.pilin.redis.runner</groupId>
     <artifactId>redis-runner</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Redis runner</name>
     <description>Parent project for Redis Runner.</description>

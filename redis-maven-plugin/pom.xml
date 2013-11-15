@@ -4,7 +4,7 @@
     <parent>
         <groupId>ru.pilin.redis.runner</groupId>
         <artifactId>redis-runner</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
     <packaging>maven-plugin</packaging>
     <artifactId>redis-maven-plugin</artifactId>
