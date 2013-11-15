@@ -37,7 +37,7 @@ public final class RedisServerConfiguration {
         this.redisConf = redisConf;
         this.hostname = hostname;
         this.port = port;
-        log.debug("Starting Redis with config {}", this.redisConf);
+        log.debug("Starting Redis {} with config {}", redisServerCmd, this.redisConf);
     }
 
     @Override
